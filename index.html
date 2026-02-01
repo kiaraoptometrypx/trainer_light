@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Fan Chart with Fogging & CYL Blur</title>
+<title>Fan Chart with Fogging & CYL Blur (iPad Compatible)</title>
 <style>
   #fan-container {
     width: 400px;
@@ -40,42 +40,41 @@
 
 <div id="fan-container">
   <svg width="400" height="400" viewBox="0 0 400 400">
-    <g id="fan-group" transform="translate(200 200)">
-      <!-- Lines generated dynamically -->
-    </g>
+    <defs id="filters">
+      <!-- Filters will be generated dynamically -->
+    </defs>
+
+    <g id="fan-group" transform="translate(200 200)"></g>
 
     <!-- White circle on top -->
     <circle cx="200" cy="200" r="50" fill="white"/>
 
-    <!-- Axis labels -->
-    <text class="axis-label" x="185" y="15">180°</text>
-    <text class="axis-label" x="370" y="205">90°</text>
-    <text class="axis-label" x="185" y="395">0°</text>
-    <text class="axis-label" x="5" y="205">90°</text>
+    <!-- Axis labels flipped -->
+    <g transform="rotate(180 185 15)"><text class="axis-label" x="0" y="0">180°</text></g>
+    <g transform="rotate(180 370 205)"><text class="axis-label" x="0" y="0">90°</text></g>
+    <g transform="rotate(180 185 395)"><text class="axis-label" x="0" y="0">0°</text></g>
+    <g transform="rotate(180 5 205)"><text class="axis-label" x="0" y="0">90°</text></g>
   </svg>
 </div>
 
 <script>
 let angle = 0;
-let cylBlur = 0.00;       // CYL blur starts at 0
+let cylBlur = 0.00;       // CYL blur
 let foggingBlur = 1.00;   // Fog starts ON
-let fogOn = true;          // fog toggle state
+let fogOn = true;
 
 const fanGroup = document.getElementById('fan-group');
+const filters = document.getElementById('filters');
 const angleVal = document.getElementById('angleVal');
 const cylVal = document.getElementById('cylVal');
 const fogBtn = document.getElementById('fogBtn');
 
-// Set initial fog button color
+// Initial fog button color
 fogBtn.style.backgroundColor = 'lightblue';
 
 // Rotation buttons
-document.getElementById('plusBtn').addEventListener('click', () => {
-  if(angle < 180) { angle += 5; updateRotation(); }
-});
-document.getElementById('minusBtn').addEventListener('click', () => {
-  if(angle > 0) { angle -= 5; updateRotation(); }
-});
+document.getElementById('plusBtn').addEventListener('click', () => { if(angle<180){ angle+=5; updateRotation(); }});
+document.getElementById('minusBtn').addEventListener('click', () => { if(angle>0){ angle-=5; updateRotation(); }});
 function updateRotation() {
   fanGroup.setAttribute('transform', `translate(200 200) rotate(${angle})`);
   angleVal.textContent = angle;
@@ -83,30 +82,48 @@ function updateRotation() {
 
 // CYL blur buttons
 function changeCyl(delta) {
-  cylBlur = Math.max(0, +(cylBlur + delta).toFixed(2)); // no negative
+  cylBlur = Math.max(0, +(cylBlur + delta).toFixed(2));
   cylVal.textContent = cylBlur.toFixed(2);
   drawFan();
 }
 
-// Toggle fogging
+// Toggle fog
 function toggleFogging() {
-  if (!fogOn) {
-    foggingBlur = 1.00;
-    fogOn = true;
-    fogBtn.style.backgroundColor = 'lightblue';
-  } else {
-    foggingBlur = 0;
-    fogOn = false;
-    fogBtn.style.backgroundColor = '';
-  }
+  fogOn = !fogOn;
+  foggingBlur = fogOn ? 1.00 : 0.00;
+  fogBtn.style.backgroundColor = fogOn ? 'lightblue' : '';
   drawFan();
+}
+
+// Create or update a filter for given blur amount
+function createFilter(id, blurVal) {
+  let existing = document.getElementById(id);
+  if(existing) { existing.querySelector('feGaussianBlur').setAttribute('stdDeviation', blurVal); return; }
+
+  const filter = document.createElementNS("http://www.w3.org/2000/svg","filter");
+  filter.setAttribute("id", id);
+  filter.setAttribute("x", "-50%");
+  filter.setAttribute("y", "-50%");
+  filter.setAttribute("width", "200%");
+  filter.setAttribute("height", "200%");
+  const blur = document.createElementNS("http://www.w3.org/2000/svg","feGaussianBlur");
+  blur.setAttribute("in","SourceGraphic");
+  blur.setAttribute("stdDeviation", blurVal);
+  filter.appendChild(blur);
+  filters.appendChild(filter);
 }
 
 // Draw fan
 function drawFan() {
   fanGroup.innerHTML = '';
   const angles = [0,15,30,45,60,75,90,105,120,135,150,165];
-  angles.forEach(a => {
+
+  angles.forEach((a,i) => {
+    const dist = Math.min(Math.abs(a-0), Math.abs(a-180));
+    const blurVal = +(dist/15 * cylBlur + foggingBlur).toFixed(2);
+    const filterId = `blur${i}`;
+    createFilter(filterId, blurVal);
+
     const line = document.createElementNS("http://www.w3.org/2000/svg","line");
     line.setAttribute("class","fan-line");
     line.setAttribute("x1","0");
@@ -114,15 +131,8 @@ function drawFan() {
     line.setAttribute("x2","0");
     line.setAttribute("y2","180");
     line.setAttribute("transform", `rotate(${a})`);
+    line.setAttribute("filter", `url(#${filterId})`);
 
-    // CYL blur (progressive)
-    let dist = Math.min(Math.abs(a-0), Math.abs(a-180));
-    let blurVal = (dist/15) * cylBlur;
-
-    // Add fog if active
-    blurVal += foggingBlur;
-
-    line.style.filter = `blur(${blurVal}px)`;
     fanGroup.appendChild(line);
   });
 }
