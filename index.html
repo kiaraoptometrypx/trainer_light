@@ -10,6 +10,7 @@
     align-items: center;
     margin: 0;
     font-family: Arial;
+    font-size:15px;
     height: 100vh;
     justify-content: center;
   }
@@ -36,13 +37,23 @@
   #right-controls { margin-left: 20px; }
   #left-controls { margin-right: 20px; }
 
-  button { font-size:16px; padding:5px 10px; }
   #cylVal { font-weight:bold; margin-left:5px; }
 
   canvas {
-    border: 1px solid #ccc;
     background: #fff;
   }
+
+button  {
+font-size:15px;
+padding:2px;
+height:50px;
+width:100px;
+border-radius:10px;
+margin-top:5px;
+margin-bottom:5px;
+}
+
+
 </style>
 </head>
 <body>
@@ -53,8 +64,8 @@
     Current CYL: <span id="cylVal">0.00</span>
   </div>
   <div>
-    Fog:
-    <button id="fogBtn" onclick="toggleFogging()">Fog 1.00 (ON)</button>
+    All lines 
+    <button id="fogBtn" onclick="toggleFogging()">Lighter</button>
   </div>
 </div>
 
@@ -62,12 +73,14 @@
   <!-- Left side buttons -->
   <div id="left-controls">
     <div>
-      CYL −
-      <button onclick="changeCyl(-0.25)">−</button>
+      Line<br>
+      <button onclick="changeCyl(-0.25)"> Lighter </button>
     </div>
     <div>
-      Rotate −5°
-      <button onclick="rotateFan(-5)">−5°</button>
+      Rotate<br>
+      <button onclick="rotateFan(-15)"> < </button><br>
+      <button onclick="rotateFan(-45)"> <<< </button>
+
     </div>
   </div>
 
@@ -77,15 +90,23 @@
   <!-- Right side buttons -->
   <div id="right-controls">
     <div>
-      CYL + 
-      <button onclick="changeCyl(0.25)">+</button>
+      Line<br>
+      <button onclick="changeCyl(0.25)"> Darker </button>
     </div>
     <div>
-      Rotate +5°
-      <button onclick="rotateFan(5)">+5°</button>
+      Rotate<br>
+      <button onclick="rotateFan(15)"> > </button><br>
+      <button onclick="rotateFan(45)"> >>> </button>
     </div>
+
   </div>
 </div>
+
+
+
+
+
+
 
 <script>
 const canvas = document.getElementById('fan-container');
@@ -99,31 +120,39 @@ let angle = 0;
 const cylVal = document.getElementById('cylVal');
 const fogBtn = document.getElementById('fogBtn');
 
-cylVal.textContent = cylBlur.toFixed(2);
+// Format CYL display as "0.75 × 90"
+function updateCylDisplay() {
+  const axis = ((90 + angle) % 180 + 180) % 180; // darkest axis
+  cylVal.textContent = `${cylBlur.toFixed(2)} × ${axis}`;
+}
+
+updateCylDisplay();
 
 // Toggle fog
 function toggleFogging() {
   fogOn = !fogOn;
-  fogBtn.textContent = fogOn ? 'Fog 1.00 (ON)' : 'Fog 1.00 (OFF)';
+  fogBtn.textContent = fogOn ? 'Lighter' : 'Darker';
   drawFan();
 }
 
 // Change CYL blur
 function changeCyl(delta) {
   cylBlur = Math.max(0, +(cylBlur + delta).toFixed(2));
-  cylVal.textContent = cylBlur.toFixed(2);
+  updateCylDisplay();
   drawFan();
 }
 
 // Rotate fan
 function rotateFan(delta) {
   angle = (angle + delta + 360) % 360;
+  updateCylDisplay();
   drawFan();
 }
 
-// Draw fan using opacity stacking
+// Draw fan
 function drawFan() {
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
   ctx.save();
   ctx.translate(200,200);
   ctx.rotate(angle * Math.PI / 180);
@@ -131,16 +160,16 @@ function drawFan() {
   const angles = [0,15,30,45,60,75,90,105,120,135,150,165];
 
   angles.forEach(a => {
-    const dist = Math.min(Math.abs(a-0), Math.abs(a-180));
+    const dist = Math.min(Math.abs(a), Math.abs(a-180));
     const totalBlur = dist/15 * cylBlur + (fogOn ? fogStrength : 0);
-    const layers = Math.max(1, Math.round(totalBlur*3));
+    const layers = Math.max(1, Math.round(totalBlur * 3));
 
     for(let i=0; i<layers; i++){
       const offset = (i - layers/2) * 0.7;
       ctx.save();
       ctx.rotate(a * Math.PI / 180);
       ctx.lineWidth = 4;
-      ctx.strokeStyle = 'rgba(0,0,0,'+(1/layers)+')';
+      ctx.strokeStyle = `rgba(0,0,0,${1/layers})`;
       ctx.beginPath();
       ctx.moveTo(offset, -150);
       ctx.lineTo(offset, 150);
@@ -148,6 +177,15 @@ function drawFan() {
       ctx.restore();
     }
   });
+
+  /* 🔴 RED DOT — DARKEST AXIS (180°) */
+  ctx.save();
+  ctx.rotate(180 * Math.PI / 180);
+  ctx.beginPath();
+  ctx.arc(0, -170, 6, 0, Math.PI * 2);
+  ctx.fillStyle = 'darkred';
+  ctx.fill();
+  ctx.restore();
 
   ctx.restore();
 
@@ -157,7 +195,7 @@ function drawFan() {
   ctx.fillStyle = 'white';
   ctx.fill();
 
-  // Axis labels upright
+  // Axis labels
   ctx.fillStyle = 'black';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
@@ -171,6 +209,17 @@ function drawFan() {
 // Initial draw
 drawFan();
 </script>
+
+
+
+
+
+
+
+
+
+
+
 
 </body>
 </html>
