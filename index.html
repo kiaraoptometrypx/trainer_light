@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Fan Chart with Fogging & CYL Blur (Side Buttons with Header)</title>
+<title>Fan Chart with Fogging & CYL Blur</title>
 <style>
   body {
     display: flex;
@@ -10,8 +10,8 @@
     align-items: center;
     margin: 0;
     font-family: Arial;
-    font-size:15px;
-    color:#404040;
+    font-size: 15px;
+    color: #404040;
     height: 100vh;
     justify-content: center;
     background: lightgrey;
@@ -28,6 +28,7 @@
   #container {
     display: flex;
     align-items: center;
+    gap: 20px;
   }
 
   #left-controls, #right-controls {
@@ -36,117 +37,114 @@
     gap: 20px;
   }
 
-  #right-controls { margin-left: 20px; }
-  #left-controls { margin-right: 20px; }
+  #cylVal { font-weight: bold; margin-left:5px; }
 
-  #cylVal { font-weight:bold; margin-left:5px; }
+  button {
+    border: 2px solid grey;
+    font-size: 15px;
+    padding: 2px;
+    height: 50px;
+    width: 100px;
+    border-radius: 10px;
+    color: #404040;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    user-select:none;
 
-canvas {
-  background: #ebebeb;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  padding:30px 30px 0 30px;
-  border-radius:30%;
+  }
+
+  .smallbtn {
+    border: 2px solid grey;
+    font-size: 15px;
+    padding: 2px;
+    height: 25px;
+    width: 100px;
+    border-radius: 10px;
+    color: #404040;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    user-select:none;
+  }
+
+#fan-wrapper {
+  width: 650px;
+  height: 600px;
+  background-image: url("https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/FCBG.jpg");
+  background-size: cover;       
+  background-position: center;  
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  justify-content: center;     
+  align-items: center;         
+  overflow: hidden;            
+  border-radius: 30%;          
+}
+
+#fan-container {
+  width: 650px;       /* fan smaller than wrapper */
+  height: 650px;
+  background: transparent;
+  display: block;
+  margin-top: 50px;   
+  margin-left: 5px;
 }
 
 
-
-button  {
-border:2px solid grey;
-font-size:15px;
-padding:2px;
-height:50px;
-width:100px;
-border-radius:10px;
-margin-top:5px;
-margin-bottom:5px;
-color:#404040;
-}
-
-.smallbtn {
-border:2px solid grey;
-font-size:15px;
-padding:2px;
-height:25px;
-width:100px;
-border-radius:10px;
-margin-top:5px;
-margin-bottom:5px;
-color:#404040;
-
-}
 
 </style>
 </head>
 <body>
 
-<!-- Header with Fog and Current CYL -->
-
 <span><b>Adjust the rotation and line darkness to match what you see.</b></span>
 <div style="margin-top:20px" id="header">
-<span style="font-size:20px" ><b>CYL Value <span style="color:darkred" id="cylVal">0.00</span></b></span>
+  <span style="font-size:20px"><b>CYL Value <span style="color:darkred" id="cylVal">0.00</span></b></span>
 </div>
 
-
-
-
 <div id="container">
-  <!-- Left side buttons -->
   <div id="left-controls">
     <div>
       <b>Line</b><br>
-      <button onclick="changeCyl(-0.25)"> Lighter </button>
+      <button onclick="changeCyl(-0.25)">Lighter</button>
     </div>
     <div>
       <b>Rotate</b><br>
-      <button onclick="rotateFan(-90)"> <<< </button><br>
-      <button onclick="rotateFan(-45)"> << </button><br>
-      <button onclick="rotateFan(-15)"> < </button>
-
+      <button onclick="rotateFan(-90)"><<<</button><br>
+      <button onclick="rotateFan(-45)"><<</button><br>
+      <button onclick="rotateFan(-15)"><</button>
     </div>
   </div>
 
-  <!-- Canvas -->
-  <canvas style="margin-top:20px" id="fan-container" width="500" height="500"></canvas>
+  <!-- Fan wrapper -->
+  <div id="fan-wrapper">
+    <canvas id="fan-container" width="500" height="500"></canvas>
+  </div>
 
-  <!-- Right side buttons -->
   <div id="right-controls">
     <div>
       <b>Line</b><br>
-      <button onclick="changeCyl(0.25)"> Darker </button>
+      <button onclick="changeCyl(0.25)">Darker</button>
     </div>
     <div>
       <b>Rotate</b><br>
-      <button onclick="rotateFan(90)"> >>> </button><br>
-      <button onclick="rotateFan(45)"> >> </button><br>
-      <button onclick="rotateFan(15)"> > </button>
+      <button onclick="rotateFan(90)">>>></button><br>
+      <button onclick="rotateFan(45)">>></button><br>
+      <button onclick="rotateFan(15)">></button>
     </div>
   </div>
-
 </div>
 
-<div style="height:20px"> </div>
-
-
+<div style="height:20px"></div>
 <div id="header">
-    <b>Change All lines </b>
-    <button id="fogBtn" onclick="toggleFogging()">Lighter</button>
-  </div>
+  <b>Change All lines</b>
+  <button id="fogBtn" onclick="toggleFogging()">Lighter</button>
+</div>
 
-<div style="height:40px"> </div>
-
-
-
-
+<div style="height:40px"></div>
 
 <script>
 const canvas = document.getElementById('fan-container');
 const ctx = canvas.getContext('2d');
-
-/* === Background image === */
-const bgImg = new Image();
-bgImg.src = "https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/FCBG.jpg";
-bgImg.onload = () => drawFan();
 
 /* === State === */
 let cylBlur = 0.00;
@@ -184,33 +182,19 @@ function rotateFan(delta) {
   drawFan();
 }
 
-/* === Draw fan === */
+/* === Draw fan lines & dots === */
 function drawFan() {
   const cw = canvas.width;
   const ch = canvas.height;
   const cx = cw / 2;
   const cy = ch / 2;
 
-  const outerR = cw * 0.290;   // ≈ 160 @ 500
-  const innerR = cw * 0.075;   // ≈ 37
-  const lineLen = cw * 0.25;   // ≈ 125
-  const dotOffset = cw * 0.29; // ≈ 180
+  const outerR = cw * 0.29;
+  const innerR = cw * 0.075;
+  const lineLen = cw * 0.25;
+  const dotOffset = cw * 0.29;
 
   ctx.clearRect(0,0,cw,ch);
-
-  /* Background (center-crop cover) */
-  if (bgImg.complete) {
-    const iw = bgImg.width;
-    const ih = bgImg.height;
-    const scale = Math.max(cw / iw, ch / ih);
-
-    const sw = (cw / scale) * 0.93;
-    const sh = (ch / scale) * 0.93;
-    const sx = (iw - sw) / 2 + 10;
-    const sy = (ih - sh) / 2 + 105;
-
-    ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, cw, ch);
-  }
 
   /* Outer white circle */
   ctx.beginPath();
@@ -242,17 +226,16 @@ function drawFan() {
     }
   });
 
-/* Red axis markers — opposite ends */
-[0, 180].forEach(a => {
-  ctx.save();
-  ctx.rotate(a * Math.PI / 180);
-  ctx.beginPath();
-  ctx.arc(0, -dotOffset, 5, 0, Math.PI * 2);
-  ctx.fillStyle = 'darkred';
-  ctx.fill();
-  ctx.restore();
-});
-
+  /* Red axis markers — opposite ends */
+  [0, 180].forEach(a => {
+    ctx.save();
+    ctx.rotate(a * Math.PI / 180);
+    ctx.beginPath();
+    ctx.arc(0, -dotOffset, 5, 0, Math.PI * 2);
+    ctx.fillStyle = 'darkred';
+    ctx.fill();
+    ctx.restore();
+  });
 
   ctx.restore();
 
@@ -265,9 +248,6 @@ function drawFan() {
 
 drawFan();
 </script>
-
-
-
 
 </body>
 </html>
