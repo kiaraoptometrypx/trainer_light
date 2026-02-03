@@ -11,6 +11,7 @@
     margin: 0;
     font-family: Arial;
     font-size:15px;
+    color:#404040;
     height: 100vh;
     justify-content: center;
     background: lightgrey;
@@ -41,11 +42,11 @@
   #cylVal { font-weight:bold; margin-left:5px; }
 
 canvas {
-  background: lightgrey;
-  border-radius: 50%;
+  background: #ebebeb;
   width: 100%;
   aspect-ratio: 1 / 1;
-padding:20px;
+  padding:30px 30px 0 30px;
+  border-radius:30%;
 }
 
 
@@ -59,6 +60,7 @@ width:100px;
 border-radius:10px;
 margin-top:5px;
 margin-bottom:5px;
+color:#404040;
 }
 
 .smallbtn {
@@ -70,6 +72,8 @@ width:100px;
 border-radius:10px;
 margin-top:5px;
 margin-bottom:5px;
+color:#404040;
+
 }
 
 </style>
@@ -77,25 +81,24 @@ margin-bottom:5px;
 <body>
 
 <!-- Header with Fog and Current CYL -->
-<div id="header">
-    Current CYL: <span style="color:#404040" id="cylVal">0.00</span>
+
+<span><b>Adjust the rotation and line darkness to match what you see.</b></span>
+<div style="margin-top:20px" id="header">
+<span style="font-size:20px" ><b>CYL Value <span style="color:darkred" id="cylVal">0.00</span></b></span>
 </div>
 
-<div id="header">
-    All lines 
-    <button class="smallbtn" id="fogBtn" onclick="toggleFogging()">Lighter</button>
-  </div>
+
 
 
 <div id="container">
   <!-- Left side buttons -->
   <div id="left-controls">
     <div>
-      Line<br>
+      <b>Line</b><br>
       <button onclick="changeCyl(-0.25)"> Lighter </button>
     </div>
     <div>
-      Rotate<br>
+      <b>Rotate</b><br>
       <button onclick="rotateFan(-90)"> <<< </button><br>
       <button onclick="rotateFan(-45)"> << </button><br>
       <button onclick="rotateFan(-15)"> < </button>
@@ -104,16 +107,16 @@ margin-bottom:5px;
   </div>
 
   <!-- Canvas -->
-  <canvas style="margin-top:20px" id="fan-container" width="400" height="400"></canvas>
+  <canvas style="margin-top:20px" id="fan-container" width="500" height="500"></canvas>
 
   <!-- Right side buttons -->
   <div id="right-controls">
     <div>
-      Line<br>
+      <b>Line</b><br>
       <button onclick="changeCyl(0.25)"> Darker </button>
     </div>
     <div>
-      Rotate<br>
+      <b>Rotate</b><br>
       <button onclick="rotateFan(90)"> >>> </button><br>
       <button onclick="rotateFan(45)"> >> </button><br>
       <button onclick="rotateFan(15)"> > </button>
@@ -122,9 +125,15 @@ margin-bottom:5px;
 
 </div>
 
-<div style="height:40px"> </div>
-<span>Tell us how you see.<br> Adjust the rotation and line darkness to match the pattern.</span>
+<div style="height:20px"> </div>
 
+
+<div id="header">
+    <b>Change All lines </b>
+    <button id="fogBtn" onclick="toggleFogging()">Lighter</button>
+  </div>
+
+<div style="height:40px"> </div>
 
 
 
@@ -134,6 +143,12 @@ margin-bottom:5px;
 const canvas = document.getElementById('fan-container');
 const ctx = canvas.getContext('2d');
 
+/* === Background image === */
+const bgImg = new Image();
+bgImg.src = "https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/FCBG.jpg";
+bgImg.onload = () => drawFan();
+
+/* === State === */
 let cylBlur = 0.00;
 let fogOn = true;
 let fogStrength = 0.50;
@@ -144,120 +159,112 @@ const fogBtn = document.getElementById('fogBtn');
 
 function updateCylDisplay() {
   let axis = (90 + angle) % 180;
-  if (axis === 0) axis = 180; // replace 0 with 180
-  let axisStr = axis.toString().padStart(3, '0'); // always 3 digits
-  cylVal.textContent = `${cylBlur.toFixed(2)} × ${axisStr}`;
+  if (axis === 0) axis = 180;
+  cylVal.textContent = `${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
 }
-
-
 
 updateCylDisplay();
 
-// Toggle fog
+/* === Controls === */
 function toggleFogging() {
   fogOn = !fogOn;
   fogBtn.textContent = fogOn ? 'Lighter' : 'Darker';
   drawFan();
 }
 
-// Change CYL blur
 function changeCyl(delta) {
   cylBlur = Math.max(0, +(cylBlur + delta).toFixed(2));
   updateCylDisplay();
   drawFan();
 }
 
-// Rotate fan
 function rotateFan(delta) {
   angle = (angle + delta + 360) % 360;
   updateCylDisplay();
   drawFan();
 }
 
-// Draw fan
+/* === Draw fan === */
 function drawFan() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const cw = canvas.width;
+  const ch = canvas.height;
+  const cx = cw / 2;
+  const cy = ch / 2;
 
-  // Center circle
+  const outerR = cw * 0.290;   // ≈ 160 @ 500
+  const innerR = cw * 0.075;   // ≈ 37
+  const lineLen = cw * 0.25;   // ≈ 125
+  const dotOffset = cw * 0.29; // ≈ 180
+
+  ctx.clearRect(0,0,cw,ch);
+
+  /* Background (center-crop cover) */
+  if (bgImg.complete) {
+    const iw = bgImg.width;
+    const ih = bgImg.height;
+    const scale = Math.max(cw / iw, ch / ih);
+
+    const sw = (cw / scale) * 0.93;
+    const sh = (ch / scale) * 0.93;
+    const sx = (iw - sw) / 2 + 10;
+    const sy = (ih - sh) / 2 + 105;
+
+    ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, cw, ch);
+  }
+
+  /* Outer white circle */
   ctx.beginPath();
-  ctx.arc(200,200,160,0,Math.PI*2);
+  ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
   ctx.fillStyle = 'white';
   ctx.fill();
 
   ctx.save();
-  ctx.translate(200,200);
+  ctx.translate(cx, cy);
   ctx.rotate(angle * Math.PI / 180);
 
   const angles = [0,15,30,45,60,75,90,105,120,135,150,165];
 
   angles.forEach(a => {
-    const dist = Math.min(Math.abs(a), Math.abs(a-180));
-const rawBlur = dist / 30 * cylBlur + (fogOn ? fogStrength : 0);
-const totalBlur = Math.min(rawBlur, 6.0); // ← MAX BLUR CAP
-    const layers = Math.max(1, Math.round(totalBlur * 3));
+    const dist = Math.min(Math.abs(a), Math.abs(a - 180));
+    const rawBlur = dist / 30 * cylBlur + (fogOn ? fogStrength : 0);
+    const layers = Math.max(1, Math.round(Math.min(rawBlur, 6) * 3));
 
-    for(let i=0; i<layers; i++){
-      const offset = (i - layers/2) * 1; // ← THIS CONTROLS PIXEL SPREAD
+    for (let i = 0; i < layers; i++) {
       ctx.save();
       ctx.rotate(a * Math.PI / 180);
       ctx.lineWidth = 4;
       ctx.strokeStyle = `rgba(64,64,64,${1/layers})`;
       ctx.beginPath();
-      ctx.moveTo(offset, -130);
-      ctx.lineTo(offset, 130);
+      ctx.moveTo(i - layers/2, -lineLen);
+      ctx.lineTo(i - layers/2, lineLen);
       ctx.stroke();
       ctx.restore();
     }
   });
 
-  /* 🔴 RED DOT — DARKEST AXIS (180°) */
+/* Red axis markers — opposite ends */
+[0, 180].forEach(a => {
   ctx.save();
-  ctx.rotate(180 * Math.PI / 180);
+  ctx.rotate(a * Math.PI / 180);
   ctx.beginPath();
-  ctx.arc(0, -145, 5, 0, Math.PI * 2);
+  ctx.arc(0, -dotOffset, 5, 0, Math.PI * 2);
   ctx.fillStyle = 'darkred';
   ctx.fill();
   ctx.restore();
+});
+
 
   ctx.restore();
 
-  // Center circle
+  /* Center white circle */
   ctx.beginPath();
-  ctx.arc(200,200,50,0,Math.PI*2);
+  ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
   ctx.fillStyle = 'white';
   ctx.fill();
-
-// Clock numbers with color and spacing
-ctx.fillStyle = '#404040'; // ← change to any color you like (e.g., 'red', '#ff0000')
-ctx.font = '600 20px Arial';    // ← change text size
-
-ctx.textAlign = 'center';
-ctx.textBaseline = 'middle';
-
-const numberRadius = 190; // ← adjust spacing from center (larger = further out)
-
-for(let i = 1; i <= 12; i++){
-  let angleRad = (i * 30 - 90) * Math.PI / 180; // -90 starts at top
-  let x = 200 + Math.cos(angleRad) * numberRadius;
-  let y = 200 + Math.sin(angleRad) * numberRadius;
-  ctx.fillText(i.toString(), x, y);
 }
 
-
-
-}
-
-// Initial draw
 drawFan();
 </script>
-
-
-
-
-
-
-
-
 
 
 
