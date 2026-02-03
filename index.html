@@ -78,8 +78,7 @@
   justify-content: center;     
   align-items: center;         
   overflow: hidden;            
-  border-radius: 30%;
-  margin:10px;
+  border-radius: 30%;          
 }
 
 #fan-container {
@@ -96,14 +95,20 @@
 </style>
 </head>
 <body>
+<div style="height:200px"></div>
 
 <span><b>Adjust the rotation and line darkness to match what you see.</b></span>
 <div style="margin-top:20px" id="header">
-  <span style="font-size:20px"><b>CYL Value <span style="color:darkred" id="cylVal">0.00</span></b></span>
+  <span style="font-size:30px"><b>CYL Value <span style="color:darkred" id="cylVal">0.00</span></b></span>
 </div>
+<div style="height:20px"></div>
+
 
 <div id="container">
   <div id="left-controls">
+<div style="height:80px"></div>
+
+
     <div>
       <b>Line</b><br>
       <button onclick="changeCyl(-0.25)">Lighter</button>
@@ -122,6 +127,12 @@
   </div>
 
   <div id="right-controls">
+
+<div>
+<b>All Lines</b><br>
+  <button id="fogBtn" onclick="toggleFogging()">Lighter</button>
+</div>
+
     <div>
       <b>Line</b><br>
       <button onclick="changeCyl(0.25)">Darker</button>
@@ -135,13 +146,20 @@
   </div>
 </div>
 
-<div style="height:20px"></div>
-<div id="header">
-  <b>Change All lines</b>
-  <button id="fogBtn" onclick="toggleFogging()">Lighter</button>
-</div>
 
-<div style="height:40px"></div>
+<div style="height:200px"></div>
+
+
+
+
+
+
+
+
+
+
+
+
 
 <script>
 const canvas = document.getElementById('fan-container');
