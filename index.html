@@ -161,7 +161,6 @@
 
 <div id="container">
   <div id="left-controls">
-<div style="height:80px"></div>
 
 
     <div>
@@ -170,9 +169,9 @@
     </div>
     <div>
       <b>Rotate</b><br>
-      <button onclick="rotateFan(-90)"><<<</button><br>
-      <button onclick="rotateFan(-45)"><<</button><br>
-      <button onclick="rotateFan(-15)"><</button>
+      <button onclick="rotateFan(-45)"><<<</button><br>
+      <button onclick="rotateFan(-15)"><<</button><br>
+      <button onclick="rotateFan(-7.5)"><</button>
     </div>
   </div>
 
@@ -183,7 +182,7 @@
 
   <div id="right-controls">
 
-<div>
+<div style="display:none">
 <b>All Lines</b><br>
   <button id="fogBtn" onclick="toggleFogging()">Lighter</button>
 </div>
@@ -194,9 +193,9 @@
     </div>
     <div>
       <b>Rotate</b><br>
-      <button onclick="rotateFan(90)">>>></button><br>
-      <button onclick="rotateFan(45)">>></button><br>
-      <button onclick="rotateFan(15)">></button>
+      <button onclick="rotateFan(45)">>>></button><br>
+      <button onclick="rotateFan(15)">>></button><br>
+      <button onclick="rotateFan(7.5)">></button>
     </div>
   </div>
 </div>
@@ -222,24 +221,24 @@
 const canvas = document.getElementById('fan-container');
 const ctx = canvas.getContext('2d');
 
-/* === State === */
+/* ===== State ===== */
 let cylBlur = 0.00;
 let fogOn = true;
-let fogStrength = 0.50;
+let fogStrength = 0.0;
 let angle = 0;
 
 const cylVal = document.getElementById('cylVal');
 const fogBtn = document.getElementById('fogBtn');
 
+/* ===== Display ===== */
 function updateCylDisplay() {
-  let axis = (90 + angle) % 180;
+  let axis = angle % 180;
   if (axis === 0) axis = 180;
-  cylVal.textContent = `${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
+  cylVal.textContent = `- ${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
 }
-
 updateCylDisplay();
 
-/* === Controls === */
+/* ===== Controls ===== */
 function toggleFogging() {
   fogOn = !fogOn;
   fogBtn.textContent = fogOn ? 'Lighter' : 'Darker';
@@ -258,7 +257,7 @@ function rotateFan(delta) {
   drawFan();
 }
 
-/* === Draw fan lines & dots === */
+/* ===== Draw ===== */
 function drawFan() {
   const cw = canvas.width;
   const ch = canvas.height;
@@ -268,9 +267,9 @@ function drawFan() {
   const outerR = cw * 0.29;
   const innerR = cw * 0.075;
   const lineLen = cw * 0.25;
-  const dotOffset = cw * 0.26;
+  const dotOffset = cw * 0.275;
 
-  ctx.clearRect(0,0,cw,ch);
+  ctx.clearRect(0, 0, cw, ch);
 
   /* Outer white circle */
   ctx.beginPath();
@@ -280,40 +279,47 @@ function drawFan() {
 
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.rotate(angle * Math.PI / 180);
 
-  const angles = [0,15,30,45,60,75,90,105,120,135,150,165];
+  const fanAngles = [0,15,30,45,60,75,90,105,120,135,150,165];
 
-  angles.forEach(a => {
-    const dist = Math.min(Math.abs(a), Math.abs(a - 180));
-    const rawBlur = dist / 30 * cylBlur + (fogOn ? fogStrength : 0);
-    const layers = Math.max(1, Math.round(Math.min(rawBlur, 6) * 3));
+  fanAngles.forEach(a => {
+
+    // 🔑 blur relative to rotating axis (fan stays fixed)
+    const rel = Math.abs(((a - angle + 90) % 180) - 90);
+    const rawBlur = (rel / 90) * (cylBlur * 2) + (fogOn ? fogStrength : 0);
+    const layers = Math.max(1, Math.round(Math.min(rawBlur, 6) * 6));
 
     for (let i = 0; i < layers; i++) {
       ctx.save();
       ctx.rotate(a * Math.PI / 180);
+
       ctx.lineWidth = 3.2;
-      ctx.strokeStyle = `rgba(64,64,64,${1/layers})`;
+      ctx.strokeStyle = `rgba(84,84,84,${1 / layers})`;
+
       ctx.beginPath();
-      ctx.moveTo(i - layers/2, -lineLen);
-      ctx.lineTo(i - layers/2, lineLen);
+      ctx.moveTo(i - layers / 2, -lineLen);
+      ctx.lineTo(i - layers / 2,  lineLen);
       ctx.stroke();
+
       ctx.restore();
     }
   });
 
-  /* Red axis markers — opposite ends */
+  ctx.restore();
+
+  /* Axis dots (rotate only these) */
   [0, 180].forEach(a => {
     ctx.save();
-    ctx.rotate(a * Math.PI / 180);
+    ctx.translate(cx, cy);
+    ctx.rotate((a + angle) * Math.PI / 180);
+
     ctx.beginPath();
     ctx.arc(0, -dotOffset, 4, 0, Math.PI * 2);
     ctx.fillStyle = 'darkred';
     ctx.fill();
+
     ctx.restore();
   });
-
-  ctx.restore();
 
   /* Center white circle */
   ctx.beginPath();
@@ -324,6 +330,11 @@ function drawFan() {
 
 drawFan();
 </script>
+
+
+
+
+
 
 </body>
 </html>
