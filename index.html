@@ -50,6 +50,7 @@
     margin-top: 5px;
     margin-bottom: 5px;
     user-select:none;
+    font-weight:600;
 
   }
 
@@ -110,6 +111,17 @@
   border-radius:50px;
 }
 
+#dc-container{
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+.dc-controls{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
 
 
 </style>
@@ -133,12 +145,38 @@
 
 
 
-<span><b>Which type of duochrome vision do you see? 1, 2, 3 or 4?</b></span>
+<span><b>Which type of duochrome vision do you see?</b></span><br>
 
 
-<div style="height:40px"></div>
+<div style="margin-top:20px" id="header">
+  <span style="font-size:25px"><b>SPH Value Correction <span id="dcHint">0.00</span></span>
 
-<div class="bg-dc"></div>
+</div>
+
+<div style="height:20px"></div>
+
+<div id="dc-container">
+  
+  <!-- Left controls -->
+  <div class="dc-controls">
+    <button class="button" onclick="selectDC(1)">1</button>
+    <button class="button" onclick="selectDC(2)">2</button>
+  </div>
+
+  <!-- Center image -->
+  <div class="bg-dc"></div>
+
+  <!-- Right controls -->
+  <div class="dc-controls">
+    <button class="button" onclick="selectDC(3)">3</button>
+    <button class="button" onclick="selectDC(4)">4</button>
+  </div>
+
+</div>
+
+
+
+
 </div>
 
 </td></tr>
@@ -153,8 +191,9 @@
 
 
 <span><b>Adjust the rotation and line darkness to match what you see.</b></span>
+
 <div style="margin-top:20px" id="header">
-  <span style="font-size:30px"><b>CYL Value <span style="color:darkred" id="cylVal">0.00</span></b></span>
+  <span style="font-size:25px"><b>CYL Value Correction<span style="color:darkred" id="cylVal">0.00</span></b></span>
 </div>
 <div style="height:20px"></div>
 
@@ -330,6 +369,32 @@ function drawFan() {
 
 drawFan();
 </script>
+
+<script>
+function selectDC(val){
+  const dcHint = document.getElementById("dcHint");
+
+  switch(val){
+    case 1:
+      dcHint.textContent = "-0.50";
+      dcHint.style.color = "darkred";
+      break;
+    case 2:
+      dcHint.textContent = "-0.25";
+      dcHint.style.color = "darkred";
+      break;
+    case 3:
+      dcHint.textContent = "+0.25";
+      dcHint.style.color = "darkblue";
+      break;
+    case 4:
+      dcHint.textContent = "+0.50";
+      dcHint.style.color = "darkblue";
+      break;
+  }
+}
+</script>
+
 
 
 
