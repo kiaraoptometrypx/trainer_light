@@ -82,8 +82,8 @@
 }
 
 #fan-container {
-  width: 650px;       /* fan smaller than wrapper */
-  height: 650px;
+  width: 600px;       /* fan smaller than wrapper */
+  height: 600px;
   background: transparent;
   display: block;
   margin-top: 50px;   
@@ -91,8 +91,8 @@
 }
 
 #page-wrapper {
-  transform: scale(0.8);
-  transform-origin: top center; /* keeps it centered horizontally */
+  transform: scale(0.75);
+  transform-origin: 50% 500px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -103,10 +103,22 @@
 
 </style>
 </head>
+
 <body>
-<div style="height:200px"></div>
+
+
+<table>
+<tr style="height:500px"><td>aa
+</td></tr>
+
+
+
+
+
+<tr><td>
 
   <div id="page-wrapper">
+
 
 
 <span><b>Adjust the rotation and line darkness to match what you see.</b></span>
@@ -160,10 +172,12 @@
 
 </div>
 
-<div style="height:200px"></div>
+</td></tr>
 
+<tr style="height:500px"><td>
+</td></tr>
 
-
+</table>
 
 
 
@@ -247,7 +261,7 @@ function drawFan() {
     for (let i = 0; i < layers; i++) {
       ctx.save();
       ctx.rotate(a * Math.PI / 180);
-      ctx.lineWidth = 4;
+      ctx.lineWidth = 2.5;
       ctx.strokeStyle = `rgba(64,64,64,${1/layers})`;
       ctx.beginPath();
       ctx.moveTo(i - layers/2, -lineLen);
