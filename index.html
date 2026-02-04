@@ -67,8 +67,8 @@
   }
 
 #fan-wrapper {
-  width: 500px;
-  height: 450px;
+  width: 600px;
+  height: 550px;
   background-image: url("https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/FCBG.jpg");
   background-size: cover;       
   background-position: center;  
@@ -82,8 +82,8 @@
 }
 
 #fan-container {
-  width: 500px;       /* fan smaller than wrapper */
-  height: 500px;
+  width: 600px;       /* fan smaller than wrapper */
+  height: 600px;
   background: transparent;
   display: block;
   margin-top: 50px;   
@@ -100,8 +100,8 @@
 }
 
 .bg-dc {
-  width: 500px;
-  height: 250px;
+  width: 600px;
+  height: 350px;
   background-image: url("https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/DCBG.jpg");
   background-size: cover;
   background-position: center;
@@ -125,7 +125,7 @@
 
 <tr><td>
 
-<div style="margin-top:500px" class="bg-dc"></div>
+<div style="margin-top:500px; margin-bottom:100px" class="bg-dc"></div>
 </td></tr>
 
 
@@ -250,10 +250,10 @@ function drawFan() {
   const cx = cw / 2;
   const cy = ch / 2;
 
-  const outerR = cw * 0.25;
+  const outerR = cw * 0.29;
   const innerR = cw * 0.075;
-  const lineLen = cw * 0.22;
-  const dotOffset = cw * 0.28;
+  const lineLen = cw * 0.25;
+  const dotOffset = cw * 0.26;
 
   ctx.clearRect(0,0,cw,ch);
 
