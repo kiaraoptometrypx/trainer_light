@@ -277,7 +277,7 @@ function drawFan() {
     for (let i = 0; i < layers; i++) {
       ctx.save();
       ctx.rotate(a * Math.PI / 180);
-      ctx.lineWidth = 2.;
+      ctx.lineWidth = 3.2;
       ctx.strokeStyle = `rgba(64,64,64,${1/layers})`;
       ctx.beginPath();
       ctx.moveTo(i - layers/2, -lineLen);
