@@ -302,7 +302,10 @@ function rotateFan(delta){
 }
 
 
-/* ===== Draw ===== */
+
+
+
+
 function drawFan() {
   const cw = canvas.width;
   const ch = canvas.height;
@@ -325,25 +328,39 @@ function drawFan() {
   ctx.save();
   ctx.translate(cx, cy);
 
-  const fanAngles = [0,15,30,45,60,75,90,105,120,135,150,165];
+  const fanAngles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
+  const maxBlur = 1.5; // max total blur
+  const totalShades = 12; // number of incremental layers
+
+  function diff180(a, b) {
+    let d = (a - b + 180) % 180;
+    return Math.min(d, 180 - d);
+  }
 
   fanAngles.forEach(a => {
+    const rel = diff180(a, angle);
+    const effectiveRel = Math.min(rel, 60);
 
-    // 🔑 blur relative to rotating axis (fan stays fixed)
-    const rel = Math.abs(((a - angle + 90) % 180) - 90);
-    const rawBlur = (rel / 90) * (cylBlur * 1.5) + (fogOn ? fogStrength : 0);
-    const layers = Math.max(1, Math.round(Math.min(rawBlur, 6) * 6));
+    // total blur with optional fog, capped
+    const rawBlur = Math.min(
+      (effectiveRel / 60) * (cylBlur * 3) + (fogOn ? fogStrength : 0),
+      maxBlur
+    );
 
-    for (let i = 0; i < layers; i++) {
+    // visible offset per shade (spread across total blur)
+    const shadeOffset = rawBlur / totalShades * cw * 0.01; // scaled to canvas
+
+    for (let i = 0; i < totalShades; i++) {
       ctx.save();
       ctx.rotate(a * Math.PI / 180);
 
       ctx.lineWidth = 3.2;
-      ctx.strokeStyle = `rgba(84,84,84,${1 / layers})`;
+      ctx.strokeStyle = `rgba(44,44,44,${1 / totalShades})`;
 
+      const offset = (i - (totalShades - 1) / 2) * shadeOffset;
       ctx.beginPath();
-      ctx.moveTo(i - layers / 2, -lineLen);
-      ctx.lineTo(i - layers / 2,  lineLen);
+      ctx.moveTo(offset, -lineLen);
+      ctx.lineTo(offset, lineLen);
       ctx.stroke();
 
       ctx.restore();
@@ -352,7 +369,7 @@ function drawFan() {
 
   ctx.restore();
 
-  /* Axis dots (rotate only these) */
+  /* Axis dots */
   [0, 180].forEach(a => {
     ctx.save();
     ctx.translate(cx, cy);
@@ -374,6 +391,16 @@ function drawFan() {
 }
 
 drawFan();
+
+
+
+
+
+
+
+
+
+
 </script>
 
 
