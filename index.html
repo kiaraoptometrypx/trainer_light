@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0.5=" />
+  <meta name="viewport" content="width=device-width, initial-scale=1=" />
 
 <title>Fan Chart with Fogging & CYL Blur</title>
 <style>
@@ -133,7 +133,7 @@
 
 <body>
 
-<div style="max-width:100%; margin:0 auto;">
+<div style="max-width:100%; margin-top:1000px">
 
 <table>
 
@@ -294,11 +294,13 @@ function changeCyl(delta) {
   drawFan();
 }
 
-function rotateFan(delta) {
-  angle = (angle + delta + 360) % 360;
+function rotateFan(delta){
+  angle = (angle + delta) % 180;
+  if (angle < 0) angle += 180; // ensure positive
   updateCylDisplay();
   drawFan();
 }
+
 
 /* ===== Draw ===== */
 function drawFan() {
@@ -329,7 +331,7 @@ function drawFan() {
 
     // 🔑 blur relative to rotating axis (fan stays fixed)
     const rel = Math.abs(((a - angle + 90) % 180) - 90);
-    const rawBlur = (rel / 90) * (cylBlur * 2) + (fogOn ? fogStrength : 0);
+    const rawBlur = (rel / 90) * (cylBlur * 1.5) + (fogOn ? fogStrength : 0);
     const layers = Math.max(1, Math.round(Math.min(rawBlur, 6) * 6));
 
     for (let i = 0; i < layers; i++) {
