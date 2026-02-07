@@ -258,25 +258,19 @@
 
 
 
-
-
 <script>
 const canvas = document.getElementById('fan-container');
 const ctx = canvas.getContext('2d');
 
 /* ===== State ===== */
-let cylBlur = 0.00;
+let cylBlur = 0.00;     // blur strength (diopters proxy)
 let fogOn = false;
-let fogStrength = 0.25;
+let fogStrength = 0.4; // extra blur when fogging
 let angle = 0;
-
-const cylVal = document.getElementById('cylVal');
-const fogBtn = document.getElementById('fogBtn');
 
 /* ===== Display ===== */
 function updateCylDisplay() {
-  let axis = angle % 180;
-  if (axis === 0) axis = 180;
+  let axis = angle % 180 || 180;
   cylVal.textContent = `- ${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
 }
 updateCylDisplay();
@@ -295,17 +289,12 @@ function changeCyl(delta) {
 }
 
 function rotateFan(delta){
-  angle = (angle + delta) % 180;
-  if (angle < 0) angle += 180; // ensure positive
+  angle = (angle + delta + 180) % 180;
   updateCylDisplay();
   drawFan();
 }
 
-
-
-
-
-
+/* ===== Drawing ===== */
 function drawFan() {
   const cw = canvas.width;
   const ch = canvas.height;
@@ -316,10 +305,15 @@ function drawFan() {
   const innerR = cw * 0.075;
   const lineLen = cw * 0.25;
   const dotOffset = cw * 0.275;
+  const CYL_BLUR_GAIN = 9;
+  const BLUR_SPREAD_DEG = 90;
+  const maxBlurPx = 4.5;
+const CYL_NONLINEAR_THRESHOLD = 0.25; // up to this, blur is linear
+const CYL_COMPRESSION = 0.75;          // beyond threshold, extra blur is scaled
 
   ctx.clearRect(0, 0, cw, ch);
 
-  /* Outer white circle */
+  /* Outer circle */
   ctx.beginPath();
   ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
   ctx.fillStyle = 'white';
@@ -328,62 +322,60 @@ function drawFan() {
   ctx.save();
   ctx.translate(cx, cy);
 
-  const fanAngles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
-  const maxBlur = 1.5; // max total blur
-  const totalShades = 12; // number of incremental layers
+  const fanAngles = [0,15,30,45,60,75,90,105,120,135,150,165];
 
-  function diff180(a, b) {
+  function diff180(a,b){
     let d = (a - b + 180) % 180;
     return Math.min(d, 180 - d);
   }
 
   fanAngles.forEach(a => {
-    const rel = diff180(a, angle);
-    const effectiveRel = Math.min(rel, 60);
+    const rel = Math.min(diff180(a, angle), BLUR_SPREAD_DEG);
 
-    // total blur with optional fog, capped
-    const rawBlur = Math.min(
-      (effectiveRel / 60) * (cylBlur * 3) + (fogOn ? fogStrength : 0),
-      maxBlur
-    );
 
-    // visible offset per shade (spread across total blur)
-    const shadeOffset = rawBlur / totalShades * cw * 0.01; // scaled to canvas
+// Compute nonlinear CYL factor
+const cylFactor = cylBlur <= CYL_NONLINEAR_THRESHOLD
+    ? cylBlur
+    : CYL_NONLINEAR_THRESHOLD + (cylBlur - CYL_NONLINEAR_THRESHOLD) * CYL_COMPRESSION;
 
-    for (let i = 0; i < totalShades; i++) {
-      ctx.save();
-      ctx.rotate(a * Math.PI / 180);
+// Final blur in pixels
+const blurPx = Math.min(
+    (rel / BLUR_SPREAD_DEG) * (cylFactor * CYL_BLUR_GAIN) + (fogOn ? fogStrength : 0),
+    maxBlurPx
+);
 
-      ctx.lineWidth = 3.2;
-      ctx.strokeStyle = `rgba(44,44,44,${1 / totalShades})`;
 
-      const offset = (i - (totalShades - 1) / 2) * shadeOffset;
-      ctx.beginPath();
-      ctx.moveTo(offset, -lineLen);
-      ctx.lineTo(offset, lineLen);
-      ctx.stroke();
 
-      ctx.restore();
-    }
-  });
-
-  ctx.restore();
-
-  /* Axis dots */
-  [0, 180].forEach(a => {
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate((a + angle) * Math.PI / 180);
+    ctx.rotate(a * Math.PI / 180);
+    ctx.filter = `blur(${blurPx.toFixed(2)}px)`;
 
+    ctx.lineWidth = 3.5;
+    ctx.strokeStyle = 'rgb(64,64,64)';
     ctx.beginPath();
-    ctx.arc(0, -dotOffset, 4, 0, Math.PI * 2);
-    ctx.fillStyle = 'darkred';
-    ctx.fill();
+    ctx.moveTo(0, -lineLen);
+    ctx.lineTo(0, lineLen);
+    ctx.stroke();
 
     ctx.restore();
   });
 
-  /* Center white circle */
+  ctx.restore();
+  ctx.filter = 'none';
+
+  /* Axis dots */
+  [0,180].forEach(a => {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((a + angle) * Math.PI / 180);
+    ctx.beginPath();
+    ctx.arc(0, -dotOffset, 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'darkred';
+    ctx.fill();
+    ctx.restore();
+  });
+
+  /* Center mask */
   ctx.beginPath();
   ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
   ctx.fillStyle = 'white';
@@ -391,16 +383,6 @@ function drawFan() {
 }
 
 drawFan();
-
-
-
-
-
-
-
-
-
-
 </script>
 
 
