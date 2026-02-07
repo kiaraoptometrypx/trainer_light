@@ -351,7 +351,7 @@ const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
       ctx.rotate(a * Math.PI / 180);
 
       ctx.lineWidth = 3.0;
-      ctx.strokeStyle = `rgba(24,24,24,${1 / totalShades})`;
+      ctx.strokeStyle = `rgba(4,4,4,${1 / totalShades})`;
 
       const offset = (i - (totalShades - 1) / 2) * shadeOffset;
       ctx.beginPath();
