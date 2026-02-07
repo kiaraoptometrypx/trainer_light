@@ -71,7 +71,7 @@
 
 #fan-wrapper {
   display: inline-flex;   /* key */
-  width: 420px;
+  width: 520px;
   height: 370px;
   background-image: url("https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/FCBG.jpg");
   background-size: cover;       
@@ -312,8 +312,8 @@ function drawFan() {
   const lineLen = cw * 0.25;
   const dotOffset = cw * 0.275;
   const fanAngles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
-  const maxBlur = 1.5; // max total blur
-  const totalShades = 60; // number of incremental layers
+  const maxBlur = 3; // max total blur
+  const totalShades = 24; // number of incremental layers
   
 
 
@@ -350,7 +350,7 @@ const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.0125
       ctx.save();
       ctx.rotate(a * Math.PI / 180);
 
-      ctx.lineWidth = 3.2;
+      ctx.lineWidth = 3.0;
       ctx.strokeStyle = `rgba(24,24,24,${1 / totalShades})`;
 
       const offset = (i - (totalShades - 1) / 2) * shadeOffset;
