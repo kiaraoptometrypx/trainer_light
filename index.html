@@ -341,8 +341,8 @@ function drawFan() {
       maxBlur
     );
 
-const NONLINEAR_EXP = 0.5;  // <1 = compress high values, >1 = exaggerate
-const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
+const NONLINEAR_EXP = 0.45;  // <1 = compress high values, >1 = exaggerate
+const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.008;
 
     for (let i = 0; i < totalShades; i++) {
       ctx.save();
