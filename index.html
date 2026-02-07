@@ -72,7 +72,7 @@
 #fan-wrapper {
   display: inline-flex;   /* key */
   width: 520px;
-  height: 370px;
+  height: 450px;
   background-image: url("https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/FCBG.jpg");
   background-size: cover;       
   background-position: center;  
@@ -87,8 +87,8 @@
 
 
 #fan-container {
-  width: 400px;       /* fan smaller than wrapper */
-  height: 400px;
+  width: 480px;       /* fan smaller than wrapper */
+  height: 480px;
   background: transparent;
   display: block;
   margin-top: 35px;   
@@ -315,8 +315,6 @@ function drawFan() {
   const maxBlur = 3; // max total blur
   const totalShades = 24; // number of incremental layers
   
-
-
   ctx.clearRect(0, 0, cw, ch);
 
   /* Outer white circle */
@@ -339,19 +337,19 @@ function drawFan() {
 
     // total blur with optional fog, capped
     const rawBlur = Math.min(
-      (effectiveRel / 90) * (cylBlur * 3) + (fogOn ? fogStrength : 0),
+      (effectiveRel / 90) * (cylBlur * 4.5) + (fogOn ? fogStrength : 0),
       maxBlur
     );
 
 const NONLINEAR_EXP = 0.5;  // <1 = compress high values, >1 = exaggerate
-const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
+const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01125;
 
     for (let i = 0; i < totalShades; i++) {
       ctx.save();
       ctx.rotate(a * Math.PI / 180);
 
-      ctx.lineWidth = 3.0;
-      ctx.strokeStyle = `rgba(4,4,4,${1 / totalShades})`;
+      ctx.lineWidth = 3.1;
+      ctx.strokeStyle = `rgba(24,24,24,${1 / totalShades})`;
 
       const offset = (i - (totalShades - 1) / 2) * shadeOffset;
       ctx.beginPath();
