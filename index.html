@@ -337,7 +337,7 @@ function drawFan() {
 
     // total blur with optional fog, capped
     const rawBlur = Math.min(
-      (effectiveRel / 90) * (cylBlur * 4.5) + (fogOn ? fogStrength : 0),
+      (effectiveRel / 90) * (cylBlur * 4) + (fogOn ? fogStrength : 0),
       maxBlur
     );
 
