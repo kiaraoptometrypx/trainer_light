@@ -372,11 +372,11 @@ function drawFan() {
 
     // total blur with optional fog, capped
     const rawBlur = Math.min(
-      (effectiveRel / 90) * (cylBlur * 3) + (fogOn ? fogStrength : 0),
+      (effectiveRel / 90) * (cylBlur * 2.5) + (fogOn ? fogStrength : 0),
       maxBlur
     );
 
-const NONLINEAR_EXP = 0.5;  // <1 = compress high values, >1 = exaggerate
+const NONLINEAR_EXP = 1;  // <1 = compress high values, >1 = exaggerate
 const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
 
 
@@ -391,11 +391,11 @@ for (let i = 0; i < totalShades; i++) {
 
   // line width decreases from center to edges
   const maxLineWidth = 3.0;
-  const minLineWidth = 4.0;
+  const minLineWidth = 5.0;
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
-  const baseColor = 0;
-  const maxColor = 150;
+  const baseColor = 30;
+  const maxColor = 160;
   const val = Math.round(baseColor + shadeOffset * (maxColor - baseColor));
   ctx.strokeStyle = `rgba(${val},${val},${val},${1.1 / totalShades})`;
 
