@@ -390,12 +390,12 @@ for (let i = 0; i < totalShades; i++) {
   const spreadFraction = Math.abs(i - (totalShades - 1) / 2) / ((totalShades - 1) / 2);
 
   // line width decreases from center to edges
-  const maxLineWidth = 4.5;
+  const maxLineWidth = 2.5;
   const minLineWidth = 4.5;
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
   const baseColor = 10;
-  const maxColor = 200;
+  const maxColor = 150;
   const val = Math.round(baseColor + shadeOffset * (maxColor - baseColor));
   ctx.strokeStyle = `rgba(${val},${val},${val},${1 / totalShades})`;
 
