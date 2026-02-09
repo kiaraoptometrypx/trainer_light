@@ -314,7 +314,7 @@ function drawFan() {
   const dotOffset = cw * 0.275;
 
   const fanAngles = [0,15,30,45,60,75,90,105,120,135,150,165];
-  const maxBlur = 7;
+  const maxBlur = 4;
 
   ctx.clearRect(0, 0, cw, ch);
 
@@ -334,10 +334,10 @@ function drawFan() {
 
   fanAngles.forEach(a => {
     const rel = diff180(a, angle);
-    const axisWeight = Math.pow(Math.min(rel, 90) / 90, 0.75);
+    const axisWeight = Math.pow(Math.min(rel, 90) / 90, 0.8);
 
     let rawBlur =
-      axisWeight * cylBlur * 4 +
+      axisWeight * cylBlur * 9 +
       (fogOn ? fogStrength : 0);
 
     rawBlur = Math.min(rawBlur, maxBlur);
@@ -345,16 +345,16 @@ function drawFan() {
     const blurNorm = rawBlur / maxBlur;
 
     /* Optical blur parameters */
-    const baseGray = 120;
-    const contrastDrop = 120 * blurNorm;
+    const baseGray = 100;
+    const contrastDrop = 100 * blurNorm;
     const c = Math.round(baseGray + contrastDrop);
 
     ctx.save();
     ctx.rotate(a * Math.PI / 180);
 
-    ctx.lineWidth = 4.0;
-    ctx.shadowColor = `rgba(${c},${c},${c},0.8)`;
-    ctx.shadowBlur = blurNorm * 18;
+    ctx.lineWidth = 3.5;
+    ctx.shadowColor = `rgba(${c},${c},${c},0.9)`;
+    ctx.shadowBlur = blurNorm * 16;
     ctx.strokeStyle = `rgb(${c},${c},${c})`;
 
     ctx.beginPath();
