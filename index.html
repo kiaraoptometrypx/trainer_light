@@ -347,8 +347,8 @@ function drawFan() {
   const lineLen = cw * 0.25;
   const dotOffset = cw * 0.275;
   const fanAngles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
-  const maxBlur = 2; // max total blur
-  const totalShades = 12; // number of incremental layers
+  const maxBlur = 3; // max total blur
+  const totalShades = 14; // number of incremental layers
   
   ctx.clearRect(0, 0, cw, ch);
 
@@ -376,7 +376,7 @@ function drawFan() {
       maxBlur
     );
 
-const NONLINEAR_EXP = 0.7;  // <1 = compress high values, >1 = exaggerate
+const NONLINEAR_EXP = 0.5;  // <1 = compress high values, >1 = exaggerate
 const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
 
 
@@ -390,14 +390,14 @@ for (let i = 0; i < totalShades; i++) {
   const spreadFraction = Math.abs(i - (totalShades - 1) / 2) / ((totalShades - 1) / 2);
 
   // line width decreases from center to edges
-  const maxLineWidth = 2.0;
-  const minLineWidth = 3.5;
+  const maxLineWidth = 3.0;
+  const minLineWidth = 4.0;
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
-  const baseColor = 10;
+  const baseColor = 0;
   const maxColor = 150;
   const val = Math.round(baseColor + shadeOffset * (maxColor - baseColor));
-  ctx.strokeStyle = `rgba(${val},${val},${val},${1 / totalShades})`;
+  ctx.strokeStyle = `rgba(${val},${val},${val},${1.5 / totalShades})`;
 
 
 
