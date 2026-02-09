@@ -347,8 +347,8 @@ function drawFan() {
   const lineLen = cw * 0.25;
   const dotOffset = cw * 0.275;
   const fanAngles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
-  const maxBlur = 3; // max total blur
-  const totalShades = 14; // number of incremental layers
+  const maxBlur = 2.5; // max total blur
+  const totalShades = 12; // number of incremental layers
   
   ctx.clearRect(0, 0, cw, ch);
 
@@ -390,8 +390,8 @@ for (let i = 0; i < totalShades; i++) {
   const spreadFraction = Math.abs(i - (totalShades - 1) / 2) / ((totalShades - 1) / 2);
 
   // line width decreases from center to edges
-  const maxLineWidth = 3.0;
-  const minLineWidth = 5.0;
+  const maxLineWidth = 2.5;
+  const minLineWidth = 3.5;
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
   const baseColor = 30;
