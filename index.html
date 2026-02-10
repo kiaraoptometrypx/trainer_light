@@ -104,14 +104,14 @@
 }
 
 .bg-dc {
-  width: 420px;
-  height: 270px;
+  width: 520px;
+  height: 350px;
   background-image: url("https://raw.githubusercontent.com/kiaraoptometrypx/trainer_light/main/DCBG.jpg");
-  background-size: cover;
-  background-position: center;
+  background-size: 120% auto;  /* zoom in 20% */
+  background-position: center calc(50% - 20%) ; 
   background-repeat: no-repeat;
   margin: 0 auto;
-  border-radius:50px;
+  border-radius: 50px;
 }
 
 #dc-container{
@@ -163,8 +163,8 @@
   
   <!-- Left controls -->
   <div class="dc-controls">
-    <button class="button" onclick="selectDC(1)">1</button>
-    <button class="button" onclick="selectDC(2)">2</button>
+    <button class="button" onclick="selectDC(1)"><b><span style="color:darkred"> Red 1</span></b></button>
+    <button class="button" onclick="selectDC(2)"><b><span style="color:darkred"> Red 2</span></b></button>
   </div>
 
   <!-- Center image -->
@@ -172,8 +172,8 @@
 
   <!-- Right controls -->
   <div class="dc-controls">
-    <button class="button" onclick="selectDC(3)">3</button>
-    <button class="button" onclick="selectDC(4)">4</button>
+    <button class="button" onclick="selectDC(3)"><b><span style="color:darkblue"> Blue 3</span></b></button>
+    <button class="button" onclick="selectDC(4)"><b><span style="color:darkblue"> Blue 4</span></b></button>
   </div>
 
 </div>
@@ -266,19 +266,19 @@ function selectDC(val){
 
   switch(val){
     case 1:
-      dcHint.textContent = "-0.50";
+      dcHint.textContent = "- 0.50 (Undercorrected)";
       dcHint.style.color = "darkred";
       break;
     case 2:
-      dcHint.textContent = "-0.25";
+      dcHint.textContent = "- 0.25 (Undercorrected)";
       dcHint.style.color = "darkred";
       break;
     case 3:
-      dcHint.textContent = "+0.25";
+      dcHint.textContent = "+ 0.25 (Optimum)";
       dcHint.style.color = "darkblue";
       break;
     case 4:
-      dcHint.textContent = "+0.50";
+      dcHint.textContent = "+ 0.50 (Overcorrected)";
       dcHint.style.color = "darkblue";
       break;
   }
@@ -312,9 +312,38 @@ const fogBtn = document.getElementById('fogBtn');
 function updateCylDisplay() {
   let axis = angle % 180;
   if (axis === 0) axis = 180;
-  cylVal.textContent = `- ${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
+
+  // Mapping: every 15° step
+  const clockMap = {
+    0: "9 ‑ 3",
+    15: "9:30 ‑ 3:30",
+    30: "10 ‑ 4",
+    45: "10:30 ‑ 4:30",
+    60: "11 ‑ 5",
+    75: "11:30 ‑ 5:30",
+    90: "12 ‑ 6",
+    105: "12:30 ‑ 6:30",
+    120: "1 ‑ 7",
+    135: "1:30 ‑ 7:30",
+    150: "2 ‑ 8",
+    165: "2:30 ‑ 8:30",
+    180: "9 ‑ 3"
+  };
+
+  // Find nearest step
+  let step = Math.round(axis / 15) * 15;
+  if(step > 180) step = 180;
+
+  const description = clockMap[step];
+
+  cylVal.innerHTML = `
+    - ${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')} (${description} deficit)
+  `;
 }
+
 updateCylDisplay();
+
+
 
 /* ===== Controls ===== */
 function toggleFogging() {
