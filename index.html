@@ -221,7 +221,7 @@
 
   <!-- Fan wrapper -->
   <div id="fan-wrapper">
-    <canvas id="fan-container" width="500" height="500"></canvas>
+    <canvas id="fan-container"></canvas>
   </div>
 
   <div id="right-controls">
@@ -336,11 +336,23 @@ function rotateFan(delta){
   drawFan();
 }
 
+function setupCanvas(canvas, ctx) {
+  const dpr = window.devicePixelRatio || 1;
+
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+
 function drawFan() {
-  const cw = canvas.width;
-  const ch = canvas.height;
-  const cx = cw / 2;
-  const cy = ch / 2;
+const rect = canvas.getBoundingClientRect();
+const cw = rect.width;
+const ch = rect.height;
+const cx = cw / 2;
+const cy = ch / 2;
 
   const outerR = cw * 0.29;
   const innerR = cw * 0.075;
@@ -435,6 +447,7 @@ for (let i = 0; i < totalShades; i++) {
   ctx.fill();
 }
 
+setupCanvas(canvas, ctx);
 drawFan();
 
 </script>
