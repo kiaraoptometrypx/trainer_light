@@ -410,12 +410,17 @@ const cy = ch / 2;
   fanAngles.forEach(a => {
     const rel = diff180(a, angle);
     const effectiveRel = Math.min(rel, 90);
+    const basePower = 1;          // shape at low cyl
+    const cylInfluence = 0.35;       // how much cyl affects curve
 
-    // total blur with optional fog, capped
-    const rawBlur = Math.min(
-      (effectiveRel / 90) * (cylBlur * 2.5) + (fogOn ? fogStrength : 0),
-      maxBlur
-    );
+const dynamicPower = basePower - (cylBlur * cylInfluence);
+const t = effectiveRel / 90;
+
+const rawBlur = Math.min(
+  Math.pow(t, Math.max(0.2, dynamicPower)) * (cylBlur * 2.5)
+  + (fogOn ? fogStrength : 0),
+  maxBlur
+);
 
 const NONLINEAR_EXP = 1;  // <1 = compress high values, >1 = exaggerate
 const shadeOffset = Math.pow(rawBlur, NONLINEAR_EXP) / totalShades * cw * 0.01;
