@@ -248,6 +248,156 @@
 
 </td></tr>
 
+<tr style="height:100px"><td>
+</td></tr>
+
+<tr><td>
+
+<div style="text-align:center; margin-bottom:15px;">
+  <span><b>Astigmatism Defect Simulation</b></span><br>
+
+<div style="margin-top:20px" id="header">
+  <span style="font-size:25px"><b>CYL Value Correction <span style="color:darkred"> - </span> <span style="color:darkred" id="astigCylVal">0.00</span> <span style="color:darkred"> x </span> <span style="color:darkred" id="astigAxisVal">180</span></b></span>
+</div>
+
+
+
+
+<div id="astig-container" style="display:flex; justify-content:center; align-items:center; gap:40px;">
+
+  <!-- Left Controls: INCREASE (+) -->
+  <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+    <b>CYL</b>
+    <button onclick="adjCyl(-0.25)" class="btn-plus">+0.25</button>
+
+    <b>AXIS</b>
+    <button onclick="adjAxis(45)" class="btn-plus">+45°</button>
+    <button onclick="adjAxis(5)" class="btn-plus">+5°</button>
+
+    <b>LETTER SIZE</b>
+    <button onclick="adjustLetterSize(25)" class="btn-plus">A+</button>
+  </div>
+
+  <!-- Center Canvas -->
+  <canvas id="astigCanvas" width="520" height="450"
+    style="background:#fff; border:1px solid #ccc; border-radius:12px;">
+  </canvas>
+
+  <!-- Right Controls: DECREASE (−) -->
+  <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+    <b>CYL</b>
+    <button onclick="adjCyl(0.25)" class="btn-minus">−0.25</button>
+
+    <b>AXIS</b>
+    <button onclick="adjAxis(-45)" class="btn-plus">-45°</button>
+    <button onclick="adjAxis(-5)" class="btn-minus">−5°</button>
+
+    <b>LETTER SIZE</b>
+    <button onclick="adjustLetterSize(-25)" class="btn-minus">A−</button>
+  </div>
+
+</div>
+
+
+<script>
+const aCanvas = document.getElementById("astigCanvas");
+const aCtx = aCanvas.getContext("2d");
+
+let cyl = 0.00;
+let axis = 180;
+let letterSize = 160; // starting font size
+
+const cylDisplay = document.getElementById("astigCylVal");
+const axisDisplay = document.getElementById("astigAxisVal");
+
+/* ===== Directional Blur ===== */
+function directionalBlur(imageData, angle, strength) {
+    const w = imageData.width;
+    const h = imageData.height;
+    const src = imageData.data;
+    const output = aCtx.createImageData(w, h);
+    const dst = output.data;
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    const radius = Math.max(1, Math.floor(strength));
+
+    for (let y=0;y<h;y++){
+        for(let x=0;x<w;x++){
+            let r=0,g=0,b=0,a=0,count=0;
+            for(let i=-radius;i<=radius;i++){
+                let sx = Math.round(x+dx*i);
+                let sy = Math.round(y+dy*i);
+                if(sx>=0 && sx<w && sy>=0 && sy<h){
+                    let idx = (sy*w+sx)*4;
+                    r+=src[idx]; g+=src[idx+1]; b+=src[idx+2]; a+=src[idx+3];
+                    count++;
+                }
+            }
+            let di = (y*w+x)*4;
+            dst[di]=r/count; dst[di+1]=g/count; dst[di+2]=b/count; dst[di+3]=a/count;
+        }
+    }
+    return output;
+}
+
+/* ===== Text Wrapping ===== */
+function wrapText(text, x, y, maxWidth, lineHeight){
+    const words = text.split(" ");
+    let line = "";
+    for(let n=0;n<words.length;n++){
+        let testLine = line + words[n] + " ";
+        let metrics = aCtx.measureText(testLine);
+        if(metrics.width>maxWidth && n>0){
+            aCtx.fillText(line,x,y);
+            line=words[n]+" ";
+            y+=lineHeight;
+        } else line=testLine;
+    }
+    aCtx.fillText(line,x,y);
+}
+
+/* ===== Controls ===== */
+function adjCyl(step){ cyl = Math.max(0, Math.min(3, cyl+step)); drawAstig(); }
+function adjAxis(step){ axis=(axis+step+180)%180; drawAstig(); }
+function adjustLetterSize(delta){ letterSize=Math.max(20,letterSize+delta); drawAstig(); }
+
+/* ===== Main Draw ===== */
+function drawAstig(){
+    aCtx.clearRect(0,0,aCanvas.width,aCanvas.height);
+
+    // Paragraph (scales with letter size)
+    const para = "Astigmatism occurs when the eye is uneven, causing light to defocus for some area.";
+    const paraSize = Math.max(15, Math.floor(letterSize/5));
+    aCtx.font = `${paraSize}px Arial`;
+    aCtx.fillStyle="black";
+    aCtx.textAlign="center";
+    aCtx.textBaseline="top";
+    wrapText(para, aCanvas.width/2, 50, 450, paraSize+5);
+
+    // Apply blur
+    const imgData = aCtx.getImageData(0,0,aCanvas.width,aCanvas.height);
+    const blurred = directionalBlur(imgData,(axis+90)*Math.PI/180,cyl*10);
+    aCtx.putImageData(blurred,0,0);
+
+    // Update display
+cylDisplay.textContent = (cyl).toFixed(2);
+    axisDisplay.textContent = axis;
+}
+
+drawAstig();
+</script>
+
+
+
+
+</td></tr>
+
+
+
+
+
+
+
 <tr style="height:500px"><td>
 </td></tr>
 
@@ -270,11 +420,11 @@ function selectDC(val){
       dcHint.style.color = "darkred";
       break;
     case 2:
-      dcHint.textContent = "- 0.25 (Undercorrected)";
+      dcHint.textContent = "- 0.25 (Optimum Near)";
       dcHint.style.color = "darkred";
       break;
     case 3:
-      dcHint.textContent = "+ 0.25 (Optimum)";
+      dcHint.textContent = "+ 0.25 (Optimum Far)";
       dcHint.style.color = "darkblue";
       break;
     case 4:
@@ -485,6 +635,18 @@ setupCanvas(canvas, ctx);
 drawFan();
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
