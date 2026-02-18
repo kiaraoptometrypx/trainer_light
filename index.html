@@ -263,36 +263,36 @@
 
 
 
-<div id="astig-container" style="display:flex; justify-content:center; align-items:center; gap:40px;">
+<div id="astig-container" style="display:flex; justify-content:center; align-items:center; gap:20px;">
 
   <!-- Left Controls: INCREASE (+) -->
-  <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+  <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
     <b>CYL</b>
     <button onclick="adjCyl(-0.25)" class="btn-plus">+0.25</button>
 
-    <b>AXIS</b>
+    <br><b>AXIS</b>
     <button onclick="adjAxis(45)" class="btn-plus">+45°</button>
     <button onclick="adjAxis(5)" class="btn-plus">+5°</button>
 
-    <b>LETTER SIZE</b>
+    <br><b>LETTER SIZE</b>
     <button onclick="adjustLetterSize(25)" class="btn-plus">A+</button>
   </div>
 
   <!-- Center Canvas -->
-  <canvas id="astigCanvas" width="520" height="450"
-    style="background:#fff; border:1px solid #ccc; border-radius:12px;">
+  <canvas id="astigCanvas" width="500" height="500"
+    style="background:#fff; border:1px solid #ccc; border-radius:50px;">
   </canvas>
 
   <!-- Right Controls: DECREASE (−) -->
-  <div style="display:flex; flex-direction:column; gap:15px; align-items:center;">
+  <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
     <b>CYL</b>
     <button onclick="adjCyl(0.25)" class="btn-minus">−0.25</button>
 
-    <b>AXIS</b>
+    <br><b>AXIS</b>
     <button onclick="adjAxis(-45)" class="btn-plus">-45°</button>
     <button onclick="adjAxis(-5)" class="btn-minus">−5°</button>
 
-    <b>LETTER SIZE</b>
+    <br><b>LETTER SIZE</b>
     <button onclick="adjustLetterSize(-25)" class="btn-minus">A−</button>
   </div>
 
@@ -305,7 +305,7 @@ const aCtx = aCanvas.getContext("2d");
 
 let cyl = 0.00;
 let axis = 180;
-let letterSize = 160; // starting font size
+let letterSize = 100; // starting font size
 
 const cylDisplay = document.getElementById("astigCylVal");
 const axisDisplay = document.getElementById("astigAxisVal");
@@ -319,7 +319,8 @@ function directionalBlur(imageData, angle, strength) {
     const dst = output.data;
     const dx = Math.cos(angle);
     const dy = Math.sin(angle);
-    const radius = Math.max(1, Math.floor(strength));
+const radius = Math.floor(strength);
+if (radius <= 0) return imageData;
 
     for (let y=0;y<h;y++){
         for(let x=0;x<w;x++){
@@ -376,7 +377,7 @@ function drawAstig(){
 
     // Apply blur
     const imgData = aCtx.getImageData(0,0,aCanvas.width,aCanvas.height);
-    const blurred = directionalBlur(imgData,(axis+90)*Math.PI/180,cyl*10);
+    const blurred = directionalBlur(imgData,(axis+90)*Math.PI/180,cyl*5);
     aCtx.putImageData(blurred,0,0);
 
     // Update display
