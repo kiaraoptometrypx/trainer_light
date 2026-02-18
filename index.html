@@ -275,7 +275,7 @@
     <button onclick="adjAxis(5)" class="btn-plus">+5°</button>
 
     <br><b>LETTER SIZE</b>
-    <button onclick="adjustLetterSize(25)" class="btn-plus">A+</button>
+    <button onclick="adjustLetterSize(50)" class="btn-plus">A+</button>
   </div>
 
   <!-- Center Canvas -->
@@ -293,7 +293,7 @@
     <button onclick="adjAxis(-5)" class="btn-minus">−5°</button>
 
     <br><b>LETTER SIZE</b>
-    <button onclick="adjustLetterSize(-25)" class="btn-minus">A−</button>
+    <button onclick="adjustLetterSize(-50)" class="btn-minus">A−</button>
   </div>
 
 </div>
@@ -305,7 +305,7 @@ const aCtx = aCanvas.getContext("2d");
 
 let cyl = 0.00;
 let axis = 180;
-let letterSize = 100; // starting font size
+let letterSize = 300; // starting font size
 
 const cylDisplay = document.getElementById("astigCylVal");
 const axisDisplay = document.getElementById("astigAxisVal");
