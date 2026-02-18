@@ -393,7 +393,168 @@ drawAstig();
 
 </td></tr>
 
+<tr><td>
 
+<div style="text-align:center; margin-top:40px;">
+
+<label><b>Balance</b></label><br>
+<input type="number" id="balanceInput" step="0.25" value="-2.00">
+<button onclick="updateBar()">Update Scale</button>
+
+<br><br>
+
+<label><b>Current</b></label><br>
+<input type="number" id="currentInput" step="0.25" value="-2.00">
+<button onclick="updateArrow()">Show Arrow</button>
+
+<div id="scaleContainer" style="width:70%; margin:20px auto; position:relative; height:160px; padding:0 20px;">
+
+    <div id="bar" style="height:20px; display:flex; margin-top:50px;">
+        <div style="flex:1; background:red;"></div>
+        <div style="flex:1; background:blue;"></div>
+    </div>
+
+    <div id="scaleMarks" style="display:flex; justify-content:space-between; height:60px; align-items:flex-start; margin-top:4px;"></div>
+
+    <div id="arrowContainer" style="display:flex; justify-content:space-between; position:absolute; bottom:0; left:20px; right:20px; height:90px; pointer-events:none;"></div>
+
+</div>
+</div>
+
+<script>
+let numbers = [];
+
+// Snap input to nearest 0.25
+function snapInput(input) {
+    let val = parseFloat(input.value);
+    if (isNaN(val)) val = 0;
+    val = Math.round(val * 4) / 4;
+    input.value = val.toFixed(2);
+}
+
+// Generate scale with balance in middle and Outside ticks
+function updateBar() {
+    snapInput(document.getElementById("balanceInput"));
+    let balance = parseFloat(document.getElementById("balanceInput").value);
+
+    const step = 0.25;
+    const leftEnd = balance + 1;  // less minus
+    const rightEnd = balance - 1; // more minus
+
+    numbers = [];
+
+    // Left side
+    for (let val = leftEnd; val > balance; val -= step) numbers.push(val.toFixed(2));
+
+    // Center (balance)
+    numbers.push(balance.toFixed(2));
+
+    // Right side
+    for (let val = balance - step; val >= rightEnd; val -= step) numbers.push(val.toFixed(2));
+
+    // Add Outside ticks
+    numbers.unshift("Outside"); // leftmost
+    numbers.push("Outside");    // rightmost
+
+    const scaleDiv = document.getElementById("scaleMarks");
+    scaleDiv.innerHTML = '';
+
+    numbers.forEach((n, idx) => {
+        const midIndex = numbers.indexOf(balance.toFixed(2));
+        const color = idx < midIndex ? 'red' : (idx > midIndex ? 'blue' : 'black');
+
+        const tickContainer = document.createElement('div');
+        tickContainer.style.flex = '1';
+        tickContainer.style.display = 'flex';
+        tickContainer.style.flexDirection = 'column';
+        tickContainer.style.alignItems = 'center';
+
+        const tick = document.createElement('div');
+        tick.style.width = '2px';
+        tick.style.height = (idx === midIndex ? '20px' : '10px');
+        tick.style.backgroundColor = color;
+
+        const numLabel = document.createElement('div');
+        numLabel.innerText = n;
+        numLabel.style.marginTop = '4px';
+        numLabel.style.fontFamily = 'monospace';
+        numLabel.style.fontSize = '12px';
+
+        tickContainer.appendChild(tick);
+        tickContainer.appendChild(numLabel);
+        scaleDiv.appendChild(tickContainer);
+    });
+
+    document.getElementById("arrowContainer").innerHTML = '';
+}
+
+// Update arrow below ticks, snap to Outside if out of scale
+function updateArrow() {
+    snapInput(document.getElementById("currentInput"));
+    const current = parseFloat(document.getElementById("currentInput").value);
+    if (isNaN(current) || numbers.length === 0) return;
+
+    const arrowContainer = document.getElementById("arrowContainer");
+    arrowContainer.innerHTML = '';
+
+    const totalTicks = numbers.length;
+
+    // Find numeric indexes (ignore Outside labels)
+    let numericIndexes = numbers.map((v, i) => isNaN(parseFloat(v)) ? null : i).filter(v=>v!==null);
+
+    // Determine closest tick
+    let relativeIndex;
+    if (current > parseFloat(numbers[numericIndexes[0]])) relativeIndex = 0; // left Outside
+    else if (current < parseFloat(numbers[numericIndexes[numericIndexes.length-1]])) relativeIndex = numbers.length-1; // right Outside
+    else {
+        // Snap to nearest numeric tick
+        relativeIndex = numericIndexes.reduce((prev, curr) => {
+            return Math.abs(parseFloat(numbers[curr]) - current) < Math.abs(parseFloat(numbers[prev]) - current) ? curr : prev;
+        }, numericIndexes[0]);
+    }
+
+    for (let i = 0; i < totalTicks; i++) {
+        const flexItem = document.createElement('div');
+        flexItem.style.flex = '1';
+        flexItem.style.position = 'relative';
+
+        if (i === relativeIndex) {
+            const arrow = document.createElement('div');
+            arrow.style.width = '0';
+            arrow.style.height = '0';
+            arrow.style.borderLeft = '6px solid transparent';
+            arrow.style.borderRight = '6px solid transparent';
+            arrow.style.borderBottom = '12px solid black';
+            arrow.style.position = 'absolute';
+            arrow.style.top = '0';
+            arrow.style.left = '50%';
+            arrow.style.transform = 'translateX(-50%)';
+            flexItem.appendChild(arrow);
+
+            const label = document.createElement('div');
+            label.style.position = 'absolute';
+            label.style.top = '14px';
+            label.style.left = '50%';
+            label.style.transform = 'translateX(-50%)';
+            label.style.fontFamily = 'monospace';
+            label.style.fontSize = '12px';
+            label.innerText = current.toFixed(2) + " (Current)";
+            flexItem.appendChild(label);
+        }
+
+        arrowContainer.appendChild(flexItem);
+    }
+}
+
+// Initialize
+updateBar();
+</script>
+
+
+
+
+  
+</td></tr>
 
 
 
