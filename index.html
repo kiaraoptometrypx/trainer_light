@@ -496,6 +496,9 @@ refreshScale();
 
 
     <div>
+
+  <button onclick="setMode('pc')">PC Reso</button>
+<br><br>
       <b>Line</b><br>
       <button onclick="changeCyl(-0.25)">Lighter</button>
     </div>
@@ -520,6 +523,9 @@ refreshScale();
 </div>
 
     <div>
+  <button onclick="setMode('ipad')">iPad Reso</button>
+<br><br>
+
       <b>Line</b><br>
       <button onclick="changeCyl(0.25)">Darker</button>
     </div>
@@ -808,6 +814,8 @@ let cylBlur = 0.00;
 let fogOn = false;
 let fogStrength = 0.25;
 let angle = 0;
+let deviceMode = 'ipad'; // default
+
 
 const cylVal = document.getElementById('cylVal');
 const fogBtn = document.getElementById('fogBtn');
@@ -869,6 +877,11 @@ function rotateFan(delta){
   drawFan();
 }
 
+function setMode(mode){
+  deviceMode = mode;
+  drawFan();
+}
+
 function setupCanvas(canvas, ctx) {
   const dpr = window.devicePixelRatio || 1;
 
@@ -892,7 +905,7 @@ const cy = ch / 2;
   const lineLen = cw * 0.25;
   const dotOffset = cw * 0.275;
   const fanAngles = [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150, 165];
-  const maxBlur = 2.5; // max total blur
+  const maxBlur = deviceMode === 'ipad' ? 2.5 : 1.5;
   const totalShades = 12; // number of incremental layers
   
   ctx.clearRect(0, 0, cw, ch);
@@ -914,8 +927,10 @@ const cy = ch / 2;
   fanAngles.forEach(a => {
     const rel = diff180(a, angle);
     const effectiveRel = Math.min(rel, 90);
-    const basePower = 1;          // shape at low cyl
+    const basePower = deviceMode === 'ipad' ? 1 : 1;   // shape at low cyl
     const cylInfluence = 0.35;       // how much cyl affects curve
+
+
 
 const dynamicPower = basePower - (cylBlur * cylInfluence);
 const t = effectiveRel / 90;
@@ -945,7 +960,8 @@ for (let i = 0; i < totalShades; i++) {
   ctx.lineWidth = maxLineWidth - spreadFraction * (maxLineWidth - minLineWidth);
 
   const baseColor = 0;
-  const maxColor = 160;
+  const maxColor = deviceMode === 'ipad' ? 160 : 120;
+
   const val = Math.round(baseColor + shadeOffset * (maxColor - baseColor));
   ctx.strokeStyle = `rgba(${val},${val},${val},${1.1 / totalShades})`;
 
