@@ -598,10 +598,19 @@ refreshScale();
 
 
 
-<div style="margin-top:40px" id="header">
-  <span style="font-size:25px">Astigmatism condition <span>- </span> <span id="astigCylVal">0.00</span> <span> x </span> <span id="astigAxisVal">180</span></span>
+<div style="margin-top:40px" >
+
+
+<span style="font-size:20">
+  - <b>Mirror from above 
+    <span style="color:darkred" id="cylMirror">0.00</span>
+  </b> -
+</span><br><br>
+
+  <span style="font-size:25px"><b>Astigmatism condition <span>- </span> <span id="astigCylVal">0.00</span> <span> x </span> <span id="astigAxisVal">180</span></b></span>
 </div>
 
+<br>
 
 
 
@@ -825,6 +834,7 @@ let deviceMode = 'ipad'; // default
 
 const cylVal = document.getElementById('cylVal');
 const fogBtn = document.getElementById('fogBtn');
+const cylMirror = document.getElementById('cylMirror');
 
 /* ===== Display ===== */
 function updateCylDisplay() {
@@ -854,9 +864,14 @@ function updateCylDisplay() {
 
   const description = clockMap[step];
 
-  cylVal.innerHTML = `
-    - ${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')} (${description} deficit)
-  `;
+const powerPart = `- ${cylBlur.toFixed(2)} × ${axis.toString().padStart(3,'0')}`;
+const fullText = `${powerPart} (${description} deficit)`;
+
+// Original (with description)
+cylVal.innerHTML = fullText;
+
+// Mirror (without description)
+cylMirror.innerHTML = powerPart;
 }
 
 updateCylDisplay();
